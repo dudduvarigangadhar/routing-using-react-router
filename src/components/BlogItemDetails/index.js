@@ -1,9 +1,13 @@
 import {Component} from 'react'
 
+import Loader from 'react-loader-spinner'
+
+import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css'
+
 import './index.css'
 
 class BlogItemDetails extends Component {
-  state = {blogData: {}}
+  state = {blogData: {}, isLoading: true}
 
   componentDidMount() {
     this.getBlogItemData()
@@ -15,31 +19,32 @@ class BlogItemDetails extends Component {
     const {id} = params
     const response = await fetch(`https://apis.ccbp.in/blogs/${id}`)
     const data = await response.json()
+    console.log(data)
     const updatedData = {
       imageUrl: data.image_url,
       title: data.title,
-      authorUrl: data.author_url,
+      avatarUrl: data.avatar_url,
       author: data.author,
       content: data.content,
       id: data.id,
       topic: data.topic,
     }
     this.setState({blogData: updatedData})
+    this.setState({isLoading: false})
   }
 
   renderBlogItemDetails = () => {
     const {blogData} = this.state
 
     const {title, imageUrl, content, avatarUrl, author} = blogData
+    console.log(imageUrl)
     return (
       <div className="blog-info">
         <h2 className="blog-details-title">{title}</h2>
-
         <div className="author-details">
           <img className="author-pic" src={avatarUrl} alt={author} />
           <p className="details-author-name">{author}</p>
         </div>
-
         <img className="blog-image" src={imageUrl} alt={title} />
         <p className="blog-content">{content}</p>
       </div>
@@ -47,7 +52,17 @@ class BlogItemDetails extends Component {
   }
 
   render() {
-    return <div className="blog-container">{this.renderBlogItemDetails()}</div>
+    const {isLoading} = this.state
+
+    return (
+      <div className="blog-container">
+        {isLoading ? (
+          <Loader type="TailSpin" color="#00BFFF" height={50} width={50} />
+        ) : (
+          this.renderBlogItemDetails()
+        )}
+      </div>
+    )
   }
 }
 
